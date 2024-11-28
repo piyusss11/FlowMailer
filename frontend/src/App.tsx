@@ -1,4 +1,5 @@
-import Canvas from "./components/Canvas"
+
+import SequenceCanvas from "./components/SequenceCanvas"
 
 
 
@@ -7,7 +8,7 @@ function App() {
 
   return (
     <>
-    <Canvas/>
+    <SequenceCanvas/>
     </>
   )
 }
