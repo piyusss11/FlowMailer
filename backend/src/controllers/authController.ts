@@ -46,8 +46,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       maxAge: 24 * 60 * 60 * 1000, // 1 day expiration
       path: "/",
     });
-    const cookies = res.get("Set-Cookie");
-    console.log("Response Cookies:", cookies);
+    // const cookies = res.get("Set-Cookie");
+    // console.log("Response Cookies:", cookies);
     res.status(200).json({ message: "login succesfully", user });
     return;
   } catch (err) {
@@ -63,8 +63,8 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     secure: true,
     httpOnly: true,
   });
-  const cookies = res.get("Set-Cookie"); // Get the "Set-Cookie" headers
-  console.log("Response Cookies:", cookies);
+  // const cookies = res.get("Set-Cookie"); // Get the "Set-Cookie" headers
+  // console.log("Response Cookies:", cookies);
   res.status(200).json({ message: "logout succesfully" });
   return;
 };
