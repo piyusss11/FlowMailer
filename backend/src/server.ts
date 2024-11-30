@@ -5,7 +5,8 @@ import cors from "cors";
 import { connectDB } from "./config/database";
 import authRouter from "./routes/auth";
 import emailRouter from "./routes/email";
-import agenda from "./config/agenda";
+import agenda, { startAgenda } from "./config/agenda";
+import nodemailer from "nodemailer";
 const app = express();
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -20,33 +21,60 @@ app.use(
 ); // to allow request from this domain
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/email", emailRouter);
+agenda.on("start", (job) => {
+  console.log(`Job ${job.attrs.name} starting...`);
+});
 
-agenda.define("send email", async (job: any) => {
+agenda.on("complete", (job) => {
+  console.log(`Job ${job.attrs.name} completed!`);
+});
+
+agenda.on("fail", (error, job) => {
+  console.error(`Job ${job.attrs.name} failed with error: ${error.message}`);
+});
+agenda.define("send-email", async (job: any) => {
+  console.log("Job is executing"); // This should log when the job executes
   const { to, subject, body } = job.attrs.data;
-
-  const nodemailer = require("nodemailer");
+   await job.save()
   const transporter = nodemailer.createTransport({
     service: "gmail",
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT || "587"),
+    secure: false,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    tls: {
+      ciphers: "SSLv3",
+    },
   });
- 
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to,
-    subject,
-    text: body,
-  });
+
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to,
+      subject,
+      text: body,
+    });
+    console.log(`Email sent to ${to} with subject "${subject}"`); // Log successful sending
+  } catch (error) {
+    console.error("Error sending email:", error); // Log any errors while sending email
+  }
 });
 
-connectDB()
-  .then(() => {
+const startServer = async () => {
+  try {
+    await connectDB();
+    await startAgenda();
+
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+  } catch (err) {
+    console.error("Failed to start the server:", err);
+    process.exit(1);
+  }
+};
+
+startServer();
