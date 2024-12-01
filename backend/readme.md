@@ -1,5 +1,14 @@
+#Tech Stack for Frontend:
 
-#Backend techStack
+-React for building the user interface
+
+-ShadCN for UI components
+
+-Tailwind CSS with custom styling
+
+-Redux Toolkit for efficient state management
+
+#Backend techStack:
 
 -Node.js for server-side logic
 

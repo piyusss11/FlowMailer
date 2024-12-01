@@ -17,6 +17,7 @@ import { LeadNode } from "./custom-nodes/LeadNode";
 import { EmailNode } from "./custom-nodes/EmailNode";
 import { AddLeadDialog } from "./dialogs/AddLeadDialog";
 import { AddEmailDialog } from "./dialogs/AddEmailDialog";
+import { Header } from "./Header";
 
 const nodeTypes = {
   lead: LeadNode,
@@ -61,7 +62,7 @@ export default function SequenceCanvas() {
     setNodes((nds) => [...nds, newNode]);
   };
 
-  const addEmailNode = (template: string) => {
+  const addEmailNode = (template: string, recipient: string, scheduleTime: string, emailContent: string) => {
     const newNodeId = `email-${Date.now()}`;
     const newNode: Node = {
       id: newNodeId,
@@ -70,6 +71,9 @@ export default function SequenceCanvas() {
       data: {
         label: "Email",
         template,
+        recipient,
+        scheduleTime,
+        emailContent,
         onDelete: () => deleteNode(newNodeId),
       },
     };
@@ -95,7 +99,9 @@ export default function SequenceCanvas() {
   };
 
   return (
-    <div className="w-full h-screen bg-slate-50">
+    <div className="flex flex-col h-screen">
+    <Header />
+    <div className="flex-grow relative">
       <div className="absolute top-4 left-4 z-10 flex gap-2">
         <AddLeadDialog onSave={addLeadNode} />
         <AddEmailDialog onSave={addEmailNode} />
@@ -114,5 +120,6 @@ export default function SequenceCanvas() {
         <MiniMap />
       </ReactFlow>
     </div>
+  </div>
   );
 }
